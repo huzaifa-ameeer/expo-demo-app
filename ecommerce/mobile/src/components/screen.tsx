@@ -2,6 +2,9 @@ import type { ReactNode } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+import { ThemeToggle } from "@/components/theme-toggle";
+import { useTheme } from "@/theme/theme";
+
 type ScreenProps = {
   title: string;
   subtitle: string;
@@ -9,11 +12,21 @@ type ScreenProps = {
 };
 
 export function Screen({ title, subtitle, children }: ScreenProps) {
+  const { colors } = useTheme();
+
   return (
-    <SafeAreaView style={styles.safe} edges={["top"]}>
+    <SafeAreaView
+      style={[styles.safe, { backgroundColor: colors.background }]}
+      edges={["top"]}
+    >
       <View style={styles.header}>
-        <Text style={styles.title}>{title}</Text>
-        <Text style={styles.subtitle}>{subtitle}</Text>
+        <View style={styles.headerText}>
+          <Text style={[styles.title, { color: colors.text }]}>{title}</Text>
+          <Text style={[styles.subtitle, { color: colors.textMuted }]}>
+            {subtitle}
+          </Text>
+        </View>
+        <ThemeToggle />
       </View>
       <View style={styles.body}>{children}</View>
     </SafeAreaView>
@@ -23,22 +36,26 @@ export function Screen({ title, subtitle, children }: ScreenProps) {
 const styles = StyleSheet.create({
   safe: {
     flex: 1,
-    backgroundColor: "#FAFAFA",
   },
   header: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    justifyContent: "space-between",
+    gap: 12,
     paddingHorizontal: 20,
     paddingTop: 16,
     paddingBottom: 12,
+  },
+  headerText: {
+    flexShrink: 1,
     gap: 4,
   },
   title: {
     fontFamily: "SpaceGrotesk_700Bold",
     fontSize: 28,
-    color: "#111827",
   },
   subtitle: {
     fontSize: 14,
-    color: "#6B7280",
   },
   body: {
     flex: 1,

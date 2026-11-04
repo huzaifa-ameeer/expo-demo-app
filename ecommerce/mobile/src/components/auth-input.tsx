@@ -1,7 +1,9 @@
 import { Ionicons } from "@expo/vector-icons";
 import type { ComponentProps } from "react";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+
+import { type ThemeColors, useTheme } from "@/theme/theme";
 
 type AuthInputProps = {
   label: string;
@@ -25,18 +27,20 @@ export function AuthInput({
   autoCapitalize = "none",
 }: AuthInputProps) {
   const [hidden, setHidden] = useState(true);
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
 
   return (
     <View style={styles.field}>
       <Text style={styles.label}>{label}</Text>
       <View style={styles.inputWrap}>
-        <Ionicons name={icon} size={18} color="#9CA3AF" />
+        <Ionicons name={icon} size={18} color={colors.textSubtle} />
         <TextInput
           style={styles.input}
           value={value}
           onChangeText={onChangeText}
           placeholder={placeholder}
-          placeholderTextColor="#9CA3AF"
+          placeholderTextColor={colors.textSubtle}
           secureTextEntry={secureTextEntry && hidden}
           keyboardType={keyboardType}
           autoCapitalize={autoCapitalize}
@@ -52,7 +56,7 @@ export function AuthInput({
             <Ionicons
               name={hidden ? "eye-outline" : "eye-off-outline"}
               size={18}
-              color="#9CA3AF"
+              color={colors.textSubtle}
             />
           </Pressable>
         ) : null}
@@ -61,29 +65,30 @@ export function AuthInput({
   );
 }
 
-const styles = StyleSheet.create({
-  field: {
-    gap: 6,
-  },
-  label: {
-    fontSize: 13,
-    fontWeight: "600",
-    color: "#374151",
-  },
-  inputWrap: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 10,
-    height: 50,
-    paddingHorizontal: 14,
-    backgroundColor: "#FFFFFF",
-    borderWidth: 1,
-    borderColor: "#E5E7EB",
-    borderRadius: 14,
-  },
-  input: {
-    flex: 1,
-    fontSize: 15,
-    color: "#111827",
-  },
-});
+const createStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
+    field: {
+      gap: 6,
+    },
+    label: {
+      fontSize: 13,
+      fontWeight: "600",
+      color: colors.textMuted,
+    },
+    inputWrap: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 10,
+      height: 50,
+      paddingHorizontal: 14,
+      backgroundColor: colors.surface,
+      borderWidth: 1,
+      borderColor: colors.border,
+      borderRadius: 14,
+    },
+    input: {
+      flex: 1,
+      fontSize: 15,
+      color: colors.text,
+    },
+  });

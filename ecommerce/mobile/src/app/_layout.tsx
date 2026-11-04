@@ -9,11 +9,13 @@ import { useEffect } from "react";
 import { View } from "react-native";
 
 import { ToastHost } from "@/components/toast-host";
+import { useTheme } from "@/theme/theme";
 
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
   const [fontsLoaded, fontError] = useFonts({ SpaceGrotesk_700Bold });
+  const { colors, isDark } = useTheme();
 
   useEffect(() => {
     if (fontsLoaded || fontError) {
@@ -26,9 +28,14 @@ export default function RootLayout() {
   }
 
   return (
-    <View style={{ flex: 1 }}>
-      <StatusBar style="dark" />
-      <Stack screenOptions={{ headerShown: false }}>
+    <View style={{ flex: 1, backgroundColor: colors.background }}>
+      <StatusBar style={isDark ? "light" : "dark"} />
+      <Stack
+        screenOptions={{
+          headerShown: false,
+          contentStyle: { backgroundColor: colors.background },
+        }}
+      >
         <Stack.Screen name="(tabs)" />
       </Stack>
       <ToastHost />

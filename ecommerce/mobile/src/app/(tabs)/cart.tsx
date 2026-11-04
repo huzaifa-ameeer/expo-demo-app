@@ -1,11 +1,19 @@
 import { Ionicons } from "@expo/vector-icons";
 import { Image } from "expo-image";
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { useMemo } from "react";
+import {
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 
 import { Screen } from "@/components/screen";
 import { PRODUCTS } from "@/data/products";
 import { useShopStore } from "@/store/use-shop-store";
 import { useToastStore } from "@/store/use-toast-store";
+import { type ThemeColors, useTheme } from "@/theme/theme";
 
 export default function CartScreen() {
   const cart = useShopStore((state) => state.cart);
@@ -13,6 +21,8 @@ export default function CartScreen() {
   const decrementFromCart = useShopStore((state) => state.decrementFromCart);
   const removeFromCart = useShopStore((state) => state.removeFromCart);
   const showToast = useToastStore((state) => state.showToast);
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
 
   const items = PRODUCTS.filter((product) => cart[product.id]).map(
     (product) => ({ product, quantity: cart[product.id] }),
@@ -26,7 +36,7 @@ export default function CartScreen() {
     return (
       <Screen title="Cart" subtitle="Review the items you are ready to buy.">
         <View style={styles.empty}>
-          <Ionicons name="cart-outline" size={32} color="#9CA3AF" />
+          <Ionicons name="cart-outline" size={32} color={colors.textSubtle} />
           <Text style={styles.emptyText}>Your cart is empty</Text>
         </View>
       </Screen>
@@ -60,7 +70,7 @@ export default function CartScreen() {
                   style={styles.stepButton}
                   hitSlop={6}
                 >
-                  <Ionicons name="remove" size={14} color="#111827" />
+                  <Ionicons name="remove" size={14} color={colors.text} />
                 </Pressable>
                 <Text style={styles.quantity}>{quantity}</Text>
                 <Pressable
@@ -70,7 +80,7 @@ export default function CartScreen() {
                   style={styles.stepButton}
                   hitSlop={6}
                 >
-                  <Ionicons name="add" size={14} color="#111827" />
+                  <Ionicons name="add" size={14} color={colors.text} />
                 </Pressable>
               </View>
             </View>
@@ -84,7 +94,11 @@ export default function CartScreen() {
               style={styles.removeButton}
               hitSlop={6}
             >
-              <Ionicons name="trash-outline" size={18} color="#6B7280" />
+              <Ionicons
+                name="trash-outline"
+                size={18}
+                color={colors.textMuted}
+              />
             </Pressable>
           </View>
         ))}
@@ -98,95 +112,96 @@ export default function CartScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  empty: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 8,
-    paddingBottom: 48,
-  },
-  emptyText: {
-    fontSize: 14,
-    color: "#9CA3AF",
-  },
-  list: {
-    gap: 12,
-    paddingBottom: 24,
-  },
-  card: {
-    flexDirection: "row",
-    alignItems: "flex-start",
-    gap: 12,
-    padding: 10,
-    backgroundColor: "#FFFFFF",
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: "#F1F2F4",
-  },
-  image: {
-    width: 72,
-    height: 72,
-    borderRadius: 12,
-    backgroundColor: "#E5E7EB",
-  },
-  info: {
-    flex: 1,
-    gap: 2,
-  },
-  name: {
-    fontSize: 14,
-    fontWeight: "600",
-    color: "#111827",
-  },
-  price: {
-    fontFamily: "SpaceGrotesk_700Bold",
-    fontSize: 14,
-    color: "#111827",
-  },
-  stepper: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 12,
-    marginTop: 6,
-  },
-  stepButton: {
-    width: 26,
-    height: 26,
-    borderRadius: 8,
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "#F3F4F6",
-  },
-  quantity: {
-    minWidth: 16,
-    textAlign: "center",
-    fontFamily: "SpaceGrotesk_700Bold",
-    fontSize: 13,
-    color: "#111827",
-  },
-  removeButton: {
-    padding: 4,
-  },
-  totalRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    marginTop: 8,
-    paddingVertical: 14,
-    paddingHorizontal: 16,
-    backgroundColor: "#FFFFFF",
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: "#F1F2F4",
-  },
-  totalLabel: {
-    fontSize: 14,
-    color: "#374151",
-  },
-  totalValue: {
-    fontFamily: "SpaceGrotesk_700Bold",
-    fontSize: 18,
-    color: "#111827",
-  },
-});
+const createStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
+    empty: {
+      flex: 1,
+      alignItems: "center",
+      justifyContent: "center",
+      gap: 8,
+      paddingBottom: 48,
+    },
+    emptyText: {
+      fontSize: 14,
+      color: colors.textSubtle,
+    },
+    list: {
+      gap: 12,
+      paddingBottom: 24,
+    },
+    card: {
+      flexDirection: "row",
+      alignItems: "flex-start",
+      gap: 12,
+      padding: 10,
+      backgroundColor: colors.surface,
+      borderRadius: 16,
+      borderWidth: 1,
+      borderColor: colors.borderSoft,
+    },
+    image: {
+      width: 72,
+      height: 72,
+      borderRadius: 12,
+      backgroundColor: colors.imagePlaceholder,
+    },
+    info: {
+      flex: 1,
+      gap: 2,
+    },
+    name: {
+      fontSize: 14,
+      fontWeight: "600",
+      color: colors.text,
+    },
+    price: {
+      fontFamily: "SpaceGrotesk_700Bold",
+      fontSize: 14,
+      color: colors.text,
+    },
+    stepper: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 12,
+      marginTop: 6,
+    },
+    stepButton: {
+      width: 26,
+      height: 26,
+      borderRadius: 8,
+      alignItems: "center",
+      justifyContent: "center",
+      backgroundColor: colors.surfaceMuted,
+    },
+    quantity: {
+      minWidth: 16,
+      textAlign: "center",
+      fontFamily: "SpaceGrotesk_700Bold",
+      fontSize: 13,
+      color: colors.text,
+    },
+    removeButton: {
+      padding: 4,
+    },
+    totalRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      marginTop: 8,
+      paddingVertical: 14,
+      paddingHorizontal: 16,
+      backgroundColor: colors.surface,
+      borderRadius: 16,
+      borderWidth: 1,
+      borderColor: colors.borderSoft,
+    },
+    totalLabel: {
+      fontSize: 14,
+      color: colors.textMuted,
+    },
+    totalValue: {
+      fontFamily: "SpaceGrotesk_700Bold",
+      fontSize: 18,
+      color: colors.text,
+    },
+  });

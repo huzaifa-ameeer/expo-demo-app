@@ -1,6 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import type { ReactNode } from "react";
+import { useMemo } from "react";
 import {
   ActivityIndicator,
   KeyboardAvoidingView,
@@ -12,6 +13,9 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+
+import { ThemeToggle } from "@/components/theme-toggle";
+import { type ThemeColors, useTheme } from "@/theme/theme";
 
 type AuthScreenProps = {
   title: string;
@@ -40,6 +44,9 @@ export function AuthScreen({
   onFooterPress,
   children,
 }: AuthScreenProps) {
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
+
   return (
     <SafeAreaView style={styles.safe} edges={["top"]}>
       <View style={styles.topBar}>
@@ -50,8 +57,9 @@ export function AuthScreen({
           style={styles.backButton}
           hitSlop={8}
         >
-          <Ionicons name="chevron-back" size={22} color="#111827" />
+          <Ionicons name="chevron-back" size={22} color={colors.text} />
         </Pressable>
+        <ThemeToggle />
       </View>
 
       <KeyboardAvoidingView
@@ -65,7 +73,11 @@ export function AuthScreen({
         >
           <View style={styles.heading}>
             <View style={styles.badge}>
-              <Ionicons name="shield-checkmark-outline" size={30} color="#FF5A1F" />
+              <Ionicons
+                name="shield-checkmark-outline"
+                size={30}
+                color={colors.accent}
+              />
             </View>
             <Text style={styles.title}>{title}</Text>
             <Text style={styles.subtitle}>{subtitle}</Text>
@@ -87,7 +99,7 @@ export function AuthScreen({
               ]}
             >
               {loading ? (
-                <ActivityIndicator color="#FF5A1F" />
+                <ActivityIndicator color={colors.accent} />
               ) : (
                 <Text
                   style={[
@@ -117,104 +129,108 @@ export function AuthScreen({
   );
 }
 
-const styles = StyleSheet.create({
-  safe: {
-    flex: 1,
-    backgroundColor: "#FAFAFA",
-  },
-  flex: {
-    flex: 1,
-  },
-  topBar: {
-    paddingHorizontal: 16,
-    paddingTop: 8,
-  },
-  backButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "#FFFFFF",
-    borderWidth: 1,
-    borderColor: "#E5E7EB",
-  },
-  content: {
-    flexGrow: 1,
-    paddingHorizontal: 24,
-    paddingTop: 8,
-    paddingBottom: 32,
-  },
-  heading: {
-    alignItems: "center",
-    gap: 8,
-    marginBottom: 28,
-  },
-  badge: {
-    width: 64,
-    height: 64,
-    borderRadius: 20,
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "#FFF1EA",
-    marginBottom: 4,
-  },
-  title: {
-    fontFamily: "SpaceGrotesk_700Bold",
-    fontSize: 28,
-    color: "#111827",
-    textAlign: "center",
-  },
-  subtitle: {
-    fontSize: 14,
-    color: "#6B7280",
-    textAlign: "center",
-  },
-  form: {
-    gap: 16,
-  },
-  submit: {
-    height: 52,
-    marginTop: 8,
-    borderRadius: 14,
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "#FF5A1F",
-  },
-  submitPressed: {
-    opacity: 0.88,
-  },
-  submitDisabled: {
-    backgroundColor: "#F3F4F6",
-  },
-  submitText: {
-    fontFamily: "SpaceGrotesk_700Bold",
-    fontSize: 15,
-    color: "#FFFFFF",
-  },
-  submitTextDisabled: {
-    color: "#9CA3AF",
-  },
-  error: {
-    fontSize: 13,
-    color: "#DC2626",
-    textAlign: "center",
-  },
-  footer: {
-    marginTop: "auto",
-    paddingTop: 28,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 6,
-  },
-  footerPrompt: {
-    fontSize: 14,
-    color: "#6B7280",
-  },
-  footerAction: {
-    fontFamily: "SpaceGrotesk_700Bold",
-    fontSize: 14,
-    color: "#FF5A1F",
-  },
-});
+const createStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
+    safe: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    flex: {
+      flex: 1,
+    },
+    topBar: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      paddingHorizontal: 16,
+      paddingTop: 8,
+    },
+    backButton: {
+      width: 40,
+      height: 40,
+      borderRadius: 20,
+      alignItems: "center",
+      justifyContent: "center",
+      backgroundColor: colors.surface,
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
+    content: {
+      flexGrow: 1,
+      paddingHorizontal: 24,
+      paddingTop: 8,
+      paddingBottom: 32,
+    },
+    heading: {
+      alignItems: "center",
+      gap: 8,
+      marginBottom: 28,
+    },
+    badge: {
+      width: 64,
+      height: 64,
+      borderRadius: 20,
+      alignItems: "center",
+      justifyContent: "center",
+      backgroundColor: colors.accentSoft,
+      marginBottom: 4,
+    },
+    title: {
+      fontFamily: "SpaceGrotesk_700Bold",
+      fontSize: 28,
+      color: colors.text,
+      textAlign: "center",
+    },
+    subtitle: {
+      fontSize: 14,
+      color: colors.textMuted,
+      textAlign: "center",
+    },
+    form: {
+      gap: 16,
+    },
+    submit: {
+      height: 52,
+      marginTop: 8,
+      borderRadius: 14,
+      alignItems: "center",
+      justifyContent: "center",
+      backgroundColor: colors.accent,
+    },
+    submitPressed: {
+      opacity: 0.88,
+    },
+    submitDisabled: {
+      backgroundColor: colors.surfaceMuted,
+    },
+    submitText: {
+      fontFamily: "SpaceGrotesk_700Bold",
+      fontSize: 15,
+      color: colors.onAccent,
+    },
+    submitTextDisabled: {
+      color: colors.textSubtle,
+    },
+    error: {
+      fontSize: 13,
+      color: colors.danger,
+      textAlign: "center",
+    },
+    footer: {
+      marginTop: "auto",
+      paddingTop: 28,
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "center",
+      gap: 6,
+    },
+    footerPrompt: {
+      fontSize: 14,
+      color: colors.textMuted,
+    },
+    footerAction: {
+      fontFamily: "SpaceGrotesk_700Bold",
+      fontSize: 14,
+      color: colors.accent,
+    },
+  });

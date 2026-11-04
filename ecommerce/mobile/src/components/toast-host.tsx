@@ -1,9 +1,10 @@
 import { Ionicons } from "@expo/vector-icons";
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { Animated, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { useToastStore } from "@/store/use-toast-store";
+import { type ThemeColors, useTheme } from "@/theme/theme";
 
 export function ToastHost() {
   const toast = useToastStore((state) => state.toast);
@@ -11,6 +12,8 @@ export function ToastHost() {
   const insets = useSafeAreaInsets();
   const opacity = useRef(new Animated.Value(0)).current;
   const translateY = useRef(new Animated.Value(-16)).current;
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
 
   useEffect(() => {
     if (!toast) {
@@ -82,38 +85,39 @@ export function ToastHost() {
   );
 }
 
-const styles = StyleSheet.create({
-  toast: {
-    position: "absolute",
-    left: 20,
-    right: 20,
-    zIndex: 1000,
-    elevation: 8,
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 10,
-    paddingVertical: 10,
-    paddingHorizontal: 12,
-    borderRadius: 14,
-    backgroundColor: "#111827",
-  },
-  icon: {
-    width: 26,
-    height: 26,
-    borderRadius: 13,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  iconCart: {
-    backgroundColor: "#FF5A1F",
-  },
-  iconFavourite: {
-    backgroundColor: "#EF4444",
-  },
-  message: {
-    flexShrink: 1,
-    fontFamily: "SpaceGrotesk_700Bold",
-    fontSize: 13,
-    color: "#FFFFFF",
-  },
-});
+const createStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
+    toast: {
+      position: "absolute",
+      left: 20,
+      right: 20,
+      zIndex: 1000,
+      elevation: 8,
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 10,
+      paddingVertical: 10,
+      paddingHorizontal: 12,
+      borderRadius: 14,
+      backgroundColor: colors.toast,
+    },
+    icon: {
+      width: 26,
+      height: 26,
+      borderRadius: 13,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    iconCart: {
+      backgroundColor: colors.accent,
+    },
+    iconFavourite: {
+      backgroundColor: colors.danger,
+    },
+    message: {
+      flexShrink: 1,
+      fontFamily: "SpaceGrotesk_700Bold",
+      fontSize: 13,
+      color: colors.onToast,
+    },
+  });

@@ -1,5 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
+import { useMemo } from "react";
 import {
   ActivityIndicator,
   Pressable,
@@ -10,6 +11,7 @@ import {
 
 import { Screen } from "@/components/screen";
 import { useAuthStore } from "@/store/use-auth-store";
+import { type ThemeColors, useTheme } from "@/theme/theme";
 
 const initialsFor = (name: string) => {
   const initials = name
@@ -26,13 +28,15 @@ export default function ProfileScreen() {
   const user = useAuthStore((state) => state.user);
   const logout = useAuthStore((state) => state.logout);
   const isSubmitting = useAuthStore((state) => state.isSubmitting);
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
 
   if (!user) {
     return (
       <Screen title="Profile" subtitle="Manage your account and preferences.">
         <View style={styles.center}>
           <View style={styles.guestAvatar}>
-            <Ionicons name="person-outline" size={34} color="#FF5A1F" />
+            <Ionicons name="person-outline" size={34} color={colors.accent} />
           </View>
           <Text style={styles.guestTitle}>You're not signed in</Text>
           <Text style={styles.guestText}>
@@ -75,7 +79,7 @@ export default function ProfileScreen() {
         <Text style={styles.name}>{user.name}</Text>
 
         <View style={styles.emailRow}>
-          <Ionicons name="mail-outline" size={15} color="#6B7280" />
+          <Ionicons name="mail-outline" size={15} color={colors.textMuted} />
           <Text style={styles.email}>{user.email}</Text>
         </View>
 
@@ -90,10 +94,14 @@ export default function ProfileScreen() {
           ]}
         >
           {isSubmitting ? (
-            <ActivityIndicator color="#EF4444" />
+            <ActivityIndicator color={colors.danger} />
           ) : (
             <>
-              <Ionicons name="log-out-outline" size={18} color="#EF4444" />
+              <Ionicons
+                name="log-out-outline"
+                size={18}
+                color={colors.danger}
+              />
               <Text style={styles.logoutText}>Logout</Text>
             </>
           )}
@@ -103,121 +111,122 @@ export default function ProfileScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  center: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 10,
-    paddingBottom: 48,
-  },
-  guestAvatar: {
-    width: 88,
-    height: 88,
-    borderRadius: 44,
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "#FFF1EA",
-    marginBottom: 6,
-  },
-  guestTitle: {
-    fontFamily: "SpaceGrotesk_700Bold",
-    fontSize: 18,
-    color: "#111827",
-  },
-  guestText: {
-    maxWidth: 280,
-    fontSize: 14,
-    lineHeight: 20,
-    color: "#6B7280",
-    textAlign: "center",
-    marginBottom: 10,
-  },
-  avatar: {
-    width: 96,
-    height: 96,
-    borderRadius: 48,
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "#FF5A1F",
-    marginBottom: 6,
-  },
-  initials: {
-    fontFamily: "SpaceGrotesk_700Bold",
-    fontSize: 34,
-    color: "#FFFFFF",
-  },
-  name: {
-    fontFamily: "SpaceGrotesk_700Bold",
-    fontSize: 22,
-    color: "#111827",
-    textAlign: "center",
-  },
-  emailRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 6,
-    marginBottom: 18,
-  },
-  email: {
-    fontSize: 14,
-    color: "#6B7280",
-  },
-  primaryButton: {
-    alignSelf: "stretch",
-    maxWidth: 320,
-    width: "100%",
-    height: 50,
-    borderRadius: 14,
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "#FF5A1F",
-  },
-  primaryButtonText: {
-    fontFamily: "SpaceGrotesk_700Bold",
-    fontSize: 15,
-    color: "#FFFFFF",
-  },
-  secondaryButton: {
-    alignSelf: "stretch",
-    maxWidth: 320,
-    width: "100%",
-    height: 50,
-    borderRadius: 14,
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "#FFFFFF",
-    borderWidth: 1,
-    borderColor: "#E5E7EB",
-  },
-  secondaryButtonText: {
-    fontFamily: "SpaceGrotesk_700Bold",
-    fontSize: 15,
-    color: "#111827",
-  },
-  logoutButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 8,
-    alignSelf: "stretch",
-    maxWidth: 320,
-    width: "100%",
-    height: 50,
-    borderRadius: 14,
-    backgroundColor: "#FEF2F2",
-    borderWidth: 1,
-    borderColor: "#FEE2E2",
-  },
-  logoutText: {
-    fontFamily: "SpaceGrotesk_700Bold",
-    fontSize: 15,
-    color: "#EF4444",
-  },
-  buttonPressed: {
-    opacity: 0.85,
-  },
-  buttonDisabled: {
-    opacity: 0.6,
-  },
-});
+const createStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
+    center: {
+      flex: 1,
+      alignItems: "center",
+      justifyContent: "center",
+      gap: 10,
+      paddingBottom: 48,
+    },
+    guestAvatar: {
+      width: 88,
+      height: 88,
+      borderRadius: 44,
+      alignItems: "center",
+      justifyContent: "center",
+      backgroundColor: colors.accentSoft,
+      marginBottom: 6,
+    },
+    guestTitle: {
+      fontFamily: "SpaceGrotesk_700Bold",
+      fontSize: 18,
+      color: colors.text,
+    },
+    guestText: {
+      maxWidth: 280,
+      fontSize: 14,
+      lineHeight: 20,
+      color: colors.textMuted,
+      textAlign: "center",
+      marginBottom: 10,
+    },
+    avatar: {
+      width: 96,
+      height: 96,
+      borderRadius: 48,
+      alignItems: "center",
+      justifyContent: "center",
+      backgroundColor: colors.accent,
+      marginBottom: 6,
+    },
+    initials: {
+      fontFamily: "SpaceGrotesk_700Bold",
+      fontSize: 34,
+      color: colors.onAccent,
+    },
+    name: {
+      fontFamily: "SpaceGrotesk_700Bold",
+      fontSize: 22,
+      color: colors.text,
+      textAlign: "center",
+    },
+    emailRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 6,
+      marginBottom: 18,
+    },
+    email: {
+      fontSize: 14,
+      color: colors.textMuted,
+    },
+    primaryButton: {
+      alignSelf: "stretch",
+      maxWidth: 320,
+      width: "100%",
+      height: 50,
+      borderRadius: 14,
+      alignItems: "center",
+      justifyContent: "center",
+      backgroundColor: colors.accent,
+    },
+    primaryButtonText: {
+      fontFamily: "SpaceGrotesk_700Bold",
+      fontSize: 15,
+      color: colors.onAccent,
+    },
+    secondaryButton: {
+      alignSelf: "stretch",
+      maxWidth: 320,
+      width: "100%",
+      height: 50,
+      borderRadius: 14,
+      alignItems: "center",
+      justifyContent: "center",
+      backgroundColor: colors.surface,
+      borderWidth: 1,
+      borderColor: colors.border,
+    },
+    secondaryButtonText: {
+      fontFamily: "SpaceGrotesk_700Bold",
+      fontSize: 15,
+      color: colors.text,
+    },
+    logoutButton: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "center",
+      gap: 8,
+      alignSelf: "stretch",
+      maxWidth: 320,
+      width: "100%",
+      height: 50,
+      borderRadius: 14,
+      backgroundColor: colors.dangerSoft,
+      borderWidth: 1,
+      borderColor: colors.dangerBorder,
+    },
+    logoutText: {
+      fontFamily: "SpaceGrotesk_700Bold",
+      fontSize: 15,
+      color: colors.danger,
+    },
+    buttonPressed: {
+      opacity: 0.85,
+    },
+    buttonDisabled: {
+      opacity: 0.6,
+    },
+  });

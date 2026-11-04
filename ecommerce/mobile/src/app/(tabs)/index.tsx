@@ -1,7 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import { Image } from "expo-image";
 import type { ComponentProps } from "react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   FlatList,
   type NativeScrollEvent,
@@ -16,10 +16,12 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+import { ThemeToggle } from "@/components/theme-toggle";
 import { PRODUCTS } from "@/data/products";
 import { apiRequest } from "@/lib/api";
 import { useShopStore } from "@/store/use-shop-store";
 import { useToastStore } from "@/store/use-toast-store";
+import { type ThemeColors, useTheme } from "@/theme/theme";
 
 const GAP = 12;
 
@@ -71,6 +73,8 @@ export default function HomeScreen() {
   const showToast = useToastStore((state) => state.showToast);
   const [categories, setCategories] =
     useState<Category[]>(DEFAULT_CATEGORIES);
+  const { colors } = useTheme();
+  const styles = useMemo(() => createStyles(colors), [colors]);
 
   useEffect(() => {
     let active = true;
@@ -117,13 +121,16 @@ export default function HomeScreen() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.content}
       >
-        <Text style={styles.homeTitle}>Home</Text>
+        <View style={styles.topHeader}>
+          <Text style={styles.homeTitle}>Home</Text>
+          <ThemeToggle />
+        </View>
 
         <View style={styles.searchBar}>
-          <Ionicons name="search-outline" size={20} color="#6B7280" />
+          <Ionicons name="search-outline" size={20} color={colors.textMuted} />
           <TextInput
             placeholder="Search products"
-            placeholderTextColor="#9CA3AF"
+            placeholderTextColor={colors.textSubtle}
             style={styles.searchInput}
           />
         </View>
@@ -162,7 +169,7 @@ export default function HomeScreen() {
                     category.icon as ComponentProps<typeof Ionicons>["name"]
                   }
                   size={22}
-                  color="#FF5A1F"
+                  color={colors.accent}
                 />
               </View>
               <Text style={styles.categoryLabel}>{category.name}</Text>
@@ -209,7 +216,7 @@ export default function HomeScreen() {
                     <Ionicons
                       name={liked ? "heart" : "heart-outline"}
                       size={18}
-                      color={liked ? "#EF4444" : "#374151"}
+                      color={liked ? colors.danger : colors.textMuted}
                     />
                   </Pressable>
                 </View>
@@ -229,15 +236,26 @@ export default function HomeScreen() {
                   }}
                   style={[
                     styles.addButton,
-                    quantity > 0 && styles.addButtonActive,
+                    {
+                      backgroundColor:
+                        quantity > 0 ? colors.accent : colors.primary,
+                    },
                   ]}
                 >
                   <Ionicons
                     name={quantity > 0 ? "checkmark" : "cart-outline"}
                     size={14}
-                    color="#FFFFFF"
+                    color={quantity > 0 ? colors.onAccent : colors.onPrimary}
                   />
-                  <Text style={styles.addButtonText}>
+                  <Text
+                    style={[
+                      styles.addButtonText,
+                      {
+                        color:
+                          quantity > 0 ? colors.onAccent : colors.onPrimary,
+                      },
+                    ]}
+                  >
                     {quantity > 0 ? `In cart · ${quantity}` : "Add to cart"}
                   </Text>
                 </Pressable>
@@ -250,134 +268,135 @@ export default function HomeScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  safe: {
-    flex: 1,
-    backgroundColor: "#FAFAFA",
-  },
-  content: {
-    paddingBottom: 24,
-  },
-  searchBar: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 10,
-    height: 48,
-    marginHorizontal: 20,
-    marginTop: 8,
-    marginBottom: 16,
-    paddingHorizontal: 14,
-    backgroundColor: "#FFFFFF",
-    borderWidth: 1,
-    borderColor: "#E5E7EB",
-    borderRadius: 14,
-  },
-  searchInput: {
-    flex: 1,
-    fontSize: 15,
-    color: "#111827",
-  },
-  bannerList: {
-    paddingHorizontal: 20,
-    gap: GAP,
-  },
-  banner: {
-    height: 180,
-    borderRadius: 18,
-    backgroundColor: "#E5E7EB",
-  },
-  homeTitle: {
-    marginTop: 8,
-    marginBottom: 12,
-    fontFamily: "SpaceGrotesk_700Bold",
-    fontSize: 26,
-    color: "#111827",
-    textAlign: "center",
-  },
-  categorySection: {
-    marginTop: 20,
-  },
-  categoryRow: {
-    paddingHorizontal: 20,
-    gap: 16,
-  },
-  category: {
-    alignItems: "center",
-    width: 76,
-    gap: 8,
-  },
-  categoryIcon: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    backgroundColor: "#FFF1EA",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  categoryLabel: {
-    fontSize: 12,
-    color: "#374151",
-    textAlign: "center",
-  },
-  productGrid: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 12,
-    paddingHorizontal: 20,
-    marginTop: 28,
-  },
-  productCard: {
-    padding: 8,
-    backgroundColor: "#FFFFFF",
-    borderRadius: 18,
-    borderWidth: 1,
-    borderColor: "#F1F2F4",
-  },
-  productImage: {
-    width: "100%",
-    aspectRatio: 1,
-    borderRadius: 14,
-    backgroundColor: "#E5E7EB",
-  },
-  likeButton: {
-    position: "absolute",
-    top: 8,
-    right: 8,
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "rgba(255, 255, 255, 0.92)",
-  },
-  productName: {
-    marginTop: 10,
-    fontSize: 13,
-    fontWeight: "600",
-    color: "#111827",
-  },
-  productPrice: {
-    marginTop: 2,
-    fontFamily: "SpaceGrotesk_700Bold",
-    fontSize: 15,
-    color: "#111827",
-  },
-  addButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 6,
-    height: 36,
-    marginTop: 10,
-    borderRadius: 10,
-    backgroundColor: "#111827",
-  },
-  addButtonActive: {
-    backgroundColor: "#FF5A1F",
-  },
-  addButtonText: {
-    fontFamily: "SpaceGrotesk_700Bold",
-    fontSize: 12,
-    color: "#FFFFFF",
-  },
-});
+const createStyles = (colors: ThemeColors) =>
+  StyleSheet.create({
+    safe: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    content: {
+      paddingBottom: 24,
+    },
+    topHeader: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "space-between",
+      marginTop: 8,
+      marginBottom: 12,
+      paddingHorizontal: 20,
+    },
+    searchBar: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 10,
+      height: 48,
+      marginHorizontal: 20,
+      marginTop: 8,
+      marginBottom: 16,
+      paddingHorizontal: 14,
+      backgroundColor: colors.surface,
+      borderWidth: 1,
+      borderColor: colors.border,
+      borderRadius: 14,
+    },
+    searchInput: {
+      flex: 1,
+      fontSize: 15,
+      color: colors.text,
+    },
+    bannerList: {
+      paddingHorizontal: 20,
+      gap: GAP,
+    },
+    banner: {
+      height: 180,
+      borderRadius: 18,
+      backgroundColor: colors.imagePlaceholder,
+    },
+    homeTitle: {
+      fontFamily: "SpaceGrotesk_700Bold",
+      fontSize: 26,
+      color: colors.text,
+    },
+    categorySection: {
+      marginTop: 20,
+    },
+    categoryRow: {
+      paddingHorizontal: 20,
+      gap: 16,
+    },
+    category: {
+      alignItems: "center",
+      width: 76,
+      gap: 8,
+    },
+    categoryIcon: {
+      width: 56,
+      height: 56,
+      borderRadius: 28,
+      backgroundColor: colors.accentSoft,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    categoryLabel: {
+      fontSize: 12,
+      color: colors.textMuted,
+      textAlign: "center",
+    },
+    productGrid: {
+      flexDirection: "row",
+      flexWrap: "wrap",
+      gap: 12,
+      paddingHorizontal: 20,
+      marginTop: 28,
+    },
+    productCard: {
+      padding: 8,
+      backgroundColor: colors.surface,
+      borderRadius: 18,
+      borderWidth: 1,
+      borderColor: colors.borderSoft,
+    },
+    productImage: {
+      width: "100%",
+      aspectRatio: 1,
+      borderRadius: 14,
+      backgroundColor: colors.imagePlaceholder,
+    },
+    likeButton: {
+      position: "absolute",
+      top: 8,
+      right: 8,
+      width: 32,
+      height: 32,
+      borderRadius: 16,
+      alignItems: "center",
+      justifyContent: "center",
+      backgroundColor: colors.surface,
+    },
+    productName: {
+      marginTop: 10,
+      fontSize: 13,
+      fontWeight: "600",
+      color: colors.text,
+    },
+    productPrice: {
+      marginTop: 2,
+      fontFamily: "SpaceGrotesk_700Bold",
+      fontSize: 15,
+      color: colors.text,
+    },
+    addButton: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "center",
+      gap: 6,
+      height: 36,
+      marginTop: 10,
+      borderRadius: 10,
+    },
+    addButtonText: {
+      fontFamily: "SpaceGrotesk_700Bold",
+      fontSize: 12,
+    },
+  });
