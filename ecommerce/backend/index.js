@@ -3,6 +3,7 @@ import dotenv from "dotenv"
 import express from "express"
 import mongoose from "mongoose"
 import authRoutes from "./routes/auth.route.js"
+import categoryRoutes from "./routes/category.route.js"
 
 dotenv.config()
 const app = express()
@@ -12,6 +13,9 @@ app.use(express.json())
 
 // Auth routes
 app.use("/api/auth", authRoutes)
+
+// Category routes
+app.use("/api/categories", categoryRoutes)
 
 const port = process.env.PORT || 8000
 
