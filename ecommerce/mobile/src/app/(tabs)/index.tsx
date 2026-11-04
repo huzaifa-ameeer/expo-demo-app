@@ -1,7 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import { Image } from "expo-image";
 import type { ComponentProps } from "react";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   FlatList,
   type NativeScrollEvent,
@@ -17,6 +17,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { PRODUCTS } from "@/data/products";
+import { apiRequest } from "@/lib/api";
 import { useShopStore } from "@/store/use-shop-store";
 import { useToastStore } from "@/store/use-toast-store";
 
@@ -41,18 +42,21 @@ const BANNERS = [
   },
 ];
 
-const CATEGORIES: {
-  label: string;
-  icon: ComponentProps<typeof Ionicons>["name"];
-}[] = [
-  { label: "Electronics", icon: "phone-portrait-outline" },
-  { label: "Fashion", icon: "shirt-outline" },
-  { label: "Groceries", icon: "basket-outline" },
-  { label: "Home", icon: "home-outline" },
-  { label: "Beauty", icon: "sparkles-outline" },
-  { label: "Sports", icon: "football-outline" },
-  { label: "Toys", icon: "game-controller-outline" },
-  { label: "Books", icon: "book-outline" },
+type Category = {
+  _id: string;
+  name: string;
+  icon: string;
+};
+
+const DEFAULT_CATEGORIES: Category[] = [
+  { _id: "electronics", name: "Electronics", icon: "phone-portrait-outline" },
+  { _id: "fashion", name: "Fashion", icon: "shirt-outline" },
+  { _id: "groceries", name: "Groceries", icon: "basket-outline" },
+  { _id: "home", name: "Home", icon: "home-outline" },
+  { _id: "beauty", name: "Beauty", icon: "sparkles-outline" },
+  { _id: "sports", name: "Sports", icon: "football-outline" },
+  { _id: "toys", name: "Toys", icon: "game-controller-outline" },
+  { _id: "books", name: "Books", icon: "book-outline" },
 ];
 
 export default function HomeScreen() {
@@ -65,6 +69,26 @@ export default function HomeScreen() {
   const toggleLike = useShopStore((state) => state.toggleLike);
   const addToCart = useShopStore((state) => state.addToCart);
   const showToast = useToastStore((state) => state.showToast);
+  const [categories, setCategories] =
+    useState<Category[]>(DEFAULT_CATEGORIES);
+
+  useEffect(() => {
+    let active = true;
+
+    apiRequest<Category[]>("/api/categories")
+      .then((data) => {
+        if (active) {
+          setCategories(data);
+        }
+      })
+      .catch(() => {
+        // Keep the default categories if the API is unreachable.
+      });
+
+    return () => {
+      active = false;
+    };
+  }, []);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -130,12 +154,18 @@ export default function HomeScreen() {
           style={styles.categorySection}
           contentContainerStyle={styles.categoryRow}
         >
-          {CATEGORIES.map((category) => (
-            <View key={category.label} style={styles.category}>
+          {categories.map((category) => (
+            <View key={category._id} style={styles.category}>
               <View style={styles.categoryIcon}>
-                <Ionicons name={category.icon} size={22} color="#FF5A1F" />
+                <Ionicons
+                  name={
+                    category.icon as ComponentProps<typeof Ionicons>["name"]
+                  }
+                  size={22}
+                  color="#FF5A1F"
+                />
               </View>
-              <Text style={styles.categoryLabel}>{category.label}</Text>
+              <Text style={styles.categoryLabel}>{category.name}</Text>
             </View>
           ))}
         </ScrollView>
